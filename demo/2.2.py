@@ -31,18 +31,35 @@ import pandas as pd
 
 # 2.3.7  点积
 # 点积只能针对一维数据模型
-import torch
-a = torch.arange(6,dtype=torch.float32)
-b = torch.ones(6,dtype=torch.float32)
-print(a)
-print(b)
-print(torch.dot(a,b))
+# import torch
+# a = torch.arange(6,dtype=torch.float32)
+# b = torch.ones(6,dtype=torch.float32)
+# print(a)
+# print(b)
+# print(torch.dot(a,b))
 
 # 2.3.8 矩阵-向量积
 # 使用向量b和张量a，第二维度相乘并累加，保留张量a 第一维度
 # import torch
-# a = torch.arange(8,dtype=torch.float32).reshape(2,4)
+# a = torch.arange(8,dtype=torch.float32).reshape(2,2,4)
 # print(a)
 # b = torch.arange(4,dtype=torch.float32)
 # print(b)
 # print(torch.mv(a, b))
+
+# 范式
+# import torch
+# u = torch.tensor([6.0,8.0])
+# print(torch.norm(u))
+
+# import numpy as np
+# from IPython import display
+# from d2l import torch as d2l
+
+#
+# def f(x):
+#     return 3 * x ** 2 - 4 * x
+
+
+from tensorboard import version
+print(version.VERSION)
