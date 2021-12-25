@@ -1,6 +1,14 @@
+# coding:utf-8
 import time
-
+from hashlib import sha1
+import requests
 from texttable import Texttable
+
+# 说明：
+URL = "http://api.feieyun.cn/Api/Open/"  # 不需要修改
+USER = "55387938@qq.com"  # *必填*：飞鹅云后台注册账号
+UKEY = "HPJtdVP3FZSBnkJ2"  # *必填*: 飞鹅云后台注册账号后生成的UKEY 【备注：这不是填打印机的KEY】
+SN = "960800945"  # *必填*：打印机编号，必须要在管理后台里手动添加打印机或者通过API添加之后，才能调用API
 
 
 class UserVisionData:
@@ -13,29 +21,35 @@ class UserVisionData:
         # 字符串分割
         array_print_data = args.split(",")
 
-        self.title = "打印测试"
-        self.printDateTime = time.strftime("%Y-%m-%d %H:%M:%S")
+        # 字符长度判断
+        if len(array_print_data) == 16:
+            self.title = "打印测试"
+            self.printDateTime = time.strftime("%Y-%m-%d %H:%M:%S")
 
-        # 用户信息
-        self.userName = array_print_data[0]
-        self.phoneNum = array_print_data[1]
-        self.billOwner = array_print_data[2]
-        self.Purpose = array_print_data[3]
+            # 用户信息
+            self.userName = array_print_data[0]
+            self.phoneNum = array_print_data[1]
+            self.billOwner = array_print_data[2]
+            self.Purpose = array_print_data[3]
 
-        # 验光信息
-        self.SPH_RightEye = array_print_data[4]
-        self.SPH_LeftEye = array_print_data[5]
-        self.CYL_RightEye = array_print_data[6]
-        self.CYL_LeftEye = array_print_data[7]
-        self.AXIS_RightEye = array_print_data[8]
-        self.AXIS_LeftEye = array_print_data[9]
-        self.DOWN_RightEye = array_print_data[10]
-        self.DOWN_LeftEye = array_print_data[11]
-        self.DIST_RightEye = array_print_data[12]
-        self.DIST_LeftEye = array_print_data[13]
+            # 验光信息
+            self.SPH_RightEye = array_print_data[4]
+            self.SPH_LeftEye = array_print_data[5]
+            self.CYL_RightEye = array_print_data[6]
+            self.CYL_LeftEye = array_print_data[7]
+            self.AXIS_RightEye = array_print_data[8]
+            self.AXIS_LeftEye = array_print_data[9]
+            self.DOWN_RightEye = array_print_data[10]
+            self.DOWN_LeftEye = array_print_data[11]
+            self.DIST_RightEye = array_print_data[12]
+            self.DIST_LeftEye = array_print_data[13]
 
-        # 备注
-        self.Comments = array_print_data[14]
+            # 备注
+            self.Comments = array_print_data[14]
+            self.filePath = array_print_data[15]
+
+            # 需要打印内容记录
+            self.logcat(args)
 
     def printTextTable(self):
         """
@@ -53,7 +67,9 @@ class UserVisionData:
                                   ["配镜用途:", self.Purpose],
                                   ["打印时间:", self.printDateTime],
                                   ["备注:", self.Comments]])
-        print(table_user_info.draw())
+        str_user_info = table_user_info.draw()
+        print(str_user_info)
+        # self.logcat(str_user_info)
 
         print()
 
@@ -66,9 +82,9 @@ class UserVisionData:
                                    self.DIST_RightEye],
                                   ["左眼:", self.SPH_LeftEye, self.CYL_LeftEye, self.AXIS_LeftEye, self.DOWN_LeftEye,
                                    self.DIST_LeftEye]])
-
-        table = table_eyes_info.draw()
-        print(table)
+        str_eyes_info = table_eyes_info.draw()
+        print(str_eyes_info)
+        # self.logcat(str_eyes_info)
 
     def getHtmlData(self):
         """
@@ -78,7 +94,7 @@ class UserVisionData:
         html = "<CB>" + self.title + "</CB>\n"
         html += "用户姓名:" + self.userName + "\n"
         html += "电话号码:" + self.phoneNum + "\n"
-        html += "  所属人:" + self.billOwner + "\n"
+        html += "所属人:" + self.billOwner + "\n"
         html += "配镜用途:" + self.Purpose + "\n"
         html += "--------------------------------\n"
         html += "验光数据:\n"
@@ -87,6 +103,7 @@ class UserVisionData:
         table_eyes_info.set_deco(Texttable.HEADER)
         table_eyes_info.set_header_align(["c", "c", "c", "c", "c", "c"])
         table_eyes_info.set_cols_align(["c", "c", "c", "c", "c", "c"])
+        table_eyes_info.set_cols_dtype(['t', 't', 't', 't', 't', 't'])
         table_eyes_info.add_rows([["", "度数", "散光", "轴位", "下加光", "瞳距"],
                                   ["右眼:", self.SPH_RightEye, self.CYL_RightEye, self.AXIS_RightEye, self.DOWN_RightEye,
                                    self.DIST_RightEye],
@@ -94,47 +111,68 @@ class UserVisionData:
                                    self.DIST_LeftEye]])
 
         html += table_eyes_info.draw().replace("=", "-")
-        html += "\n--------------------------------\n"
+        html += "\n------------------------------------------\n"
         html += "备注信息:" + self.Comments + "\n"
         html += "打印时间:" + self.printDateTime + "\n"
+
+        self.logcat(html)
         return html
 
+    def logcat(self, log):
+        """
+        将需要打印内容记录日志
+        :param log:打印内容
+        :return:
+        """
+        # 文件路径
+        filePath = self.filePath + "\\log.txt"
+        log = time.strftime("%Y-%m-%d %H:%M:%S") + ":  \n==================================\n" + log
+        with open(filePath, "a") as file:
+            file.write(log + "\n\n")
 
-def formatPrintData(data):
-    pass
-    # # 文件路径
-    # filePath = array_print_data[15] + "\\log.txt"
-    #
-    # with open(filePath, "w+") as file:
-    #     for i in range(len(array_print_data)):
-    #         file.write(str(i) + ":" + array_print_data[i] + "\n")
+    def signature(STIME):
+        """
+        HTML 接口请求签名
+        :return:
+        """
+        s1 = sha1()
+        s1.update((USER + UKEY + STIME).encode())
+        return s1.hexdigest()
+
+    def requestPrintApi(self, content):
+        """
+        云端打印接口请求
+        :param content:需要打印内容的HTML格式
+        :return:
+        """
+        STIME = str(int(time.time()))  # 不需要修改
+        params = {
+            'user': USER,
+            'sig': self.signature(STIME),
+            'stime': STIME,
+            'apiname': 'Open_printMsg',  # 固定值,不需要修改
+            'sn': SN,
+            'content': content,
+            'times': '1'  # 打印联数
+        }
+        response = requests.post(URL, data=params, timeout=30)
+        code = response.status_code
+        if code == 200:
+            self.logcat(response.content)
+            print(response.content)
+        else:
+            self.logcat("print error:" + response.content)
+            print("print error:" + response.content)
 
 
 def printData():
-    data = "姓名1,手机号1,验光单所属人1,配镜用途1,右眼SPH,右眼SPH,右眼CYL,右眼CYL,右眼AXIS,右眼AXIS,右眼下加光,右眼下加光,右眼瞳距,右眼瞳距,comments,D:\\print"
+    data = "姓名1,手机号1,验光单所属人1,配镜用途1,1.0,1.1,1.2,1.3,1.4,1.5,1.6,1.7,1.8,1.9,comments,D:\\print"
     # data = sys.argv[1]
 
     userVisionData = UserVisionData(data)
     userVisionData.printTextTable()
     print(userVisionData.getHtmlData())
-
-    #
-    # print_localTime = time.local(time.time())
-    # print_strTime = time.strftime("%Y-%m-%d %H:%M:%S", print_localTime)
-    #
-    # print_html = "<CB>5.67眼镜甄选</CB><BR>"
-    # print_html += "<CB>您眼镜BUG的修复师</CB><BR>"
-    # print_html += "基本信息:" + userName + " " + phoneNum + "<BR>"
-    # print_html += "所属人:" + billOwner + "<BR>"
-    # print_html += "配镜用途:" + Purpose + "<BR>"
-    # print_html += "打印时间:" + print_strTime + "<BR>"
-    # print_html += "--------------------------------<BR>"
-    #
-    # print_html += "验光数据<BR>"
-    # print_html += "--------------------------------<BR>"
-    # print_html += "--------------------------------<BR>"
-    # print_html += "备注信息"
-    # print_html += "--------------------------------<BR>"
+    # userVisionData.requestPrintApi()
 
 
 if __name__ == '__main__':
