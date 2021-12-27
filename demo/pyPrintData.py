@@ -1,14 +1,21 @@
 # coding:utf-8
+import sys
 import time
 from hashlib import sha1
 import requests
 from texttable import Texttable
 
-# 说明：
+# 说明：飞鹅云后台配置参数
 URL = "http://api.feieyun.cn/Api/Open/"  # 不需要修改
 USER = "55387938@qq.com"  # *必填*：飞鹅云后台注册账号
 UKEY = "HPJtdVP3FZSBnkJ2"  # *必填*: 飞鹅云后台注册账号后生成的UKEY 【备注：这不是填打印机的KEY】
 SN = "960800945"  # *必填*：打印机编号，必须要在管理后台里手动添加打印机或者通过API添加之后，才能调用API
+
+
+# 飞鹅云后台入口和账号
+# https://admin.feieyun.com/index.php
+# 55387938@qq.com
+# 12345678
 
 
 class UserVisionData:
@@ -23,7 +30,7 @@ class UserVisionData:
 
         # 字符长度判断
         if len(array_print_data) == 16:
-            self.title = "打印测试"
+            self.title = "5.67眼镜甄选"
             self.printDateTime = time.strftime("%Y-%m-%d %H:%M:%S")
 
             # 用户信息
@@ -91,12 +98,15 @@ class UserVisionData:
         获取云端打印数据格式
         :return:返回html数据打印格式
         """
+
+        split_line = "------------------------------------------"
+
         html = "<CB>" + self.title + "</CB>\n"
         html += "用户姓名:" + self.userName + "\n"
         html += "电话号码:" + self.phoneNum + "\n"
         html += "所属人:" + self.billOwner + "\n"
         html += "配镜用途:" + self.Purpose + "\n"
-        html += "--------------------------------\n"
+        html += split_line + "\n"
         html += "验光数据:\n"
 
         table_eyes_info = Texttable()
@@ -110,10 +120,19 @@ class UserVisionData:
                                   ["左眼:", self.SPH_LeftEye, self.CYL_LeftEye, self.AXIS_LeftEye, self.DOWN_LeftEye,
                                    self.DIST_LeftEye]])
 
-        html += table_eyes_info.draw().replace("=", "-")
-        html += "\n------------------------------------------\n"
+        html += table_eyes_info.draw()
+        html += "\n"
+        html += split_line + "\n"
         html += "备注信息:" + self.Comments + "\n"
         html += "打印时间:" + self.printDateTime + "\n"
+        html += split_line + "\n"
+        html += "欢迎光临,谢谢惠顾!\n"
+        html += "联系方式:13621603550\n"
+        html += "门店地址:杨高中路2108号\n"
+
+        # 格式化HTML
+        html = html.replace("=", "-")
+        html = html.replace("\n", "<BR>")
 
         self.logcat(html)
         return html
@@ -126,11 +145,11 @@ class UserVisionData:
         """
         # 文件路径
         filePath = self.filePath + "\\log.txt"
-        log = time.strftime("%Y-%m-%d %H:%M:%S") + ":  \n==================================\n" + log
+        log = time.strftime("%Y-%m-%d %H:%M:%S") + ":  \n-------------------------\n" + log
         with open(filePath, "a") as file:
             file.write(log + "\n\n")
 
-    def signature(STIME):
+    def signature(self, STIME):
         """
         HTML 接口请求签名
         :return:
@@ -166,13 +185,23 @@ class UserVisionData:
 
 
 def printData():
-    data = "姓名1,手机号1,验光单所属人1,配镜用途1,1.0,1.1,1.2,1.3,1.4,1.5,1.6,1.7,1.8,1.9,comments,D:\\print"
-    # data = sys.argv[1]
+    # data = "张三,1388888998,张三朋友,矫正视力,0.9,1.5,1.1,1.6,1.2,1.7,1.3,1.8,1.4,1.9,需要镜架和发票,D:\print"
+    if len(sys.argv) == 2:
+        data = sys.argv[1]
 
-    userVisionData = UserVisionData(data)
-    userVisionData.printTextTable()
-    print(userVisionData.getHtmlData())
-    # userVisionData.requestPrintApi()
+        # 初始化用户数据
+        userVisionData = UserVisionData(data)
+        # userVisionData.printTextTable()
+
+        # 格式化云端打印数据
+        html_content = userVisionData.getHtmlData()
+        print(html_content)
+
+        # 需要云端打印可以开放注释
+        userVisionData.requestPrintApi(html_content)
+
+    else:
+        print("input parameters error...")
 
 
 if __name__ == '__main__':
