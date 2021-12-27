@@ -15,7 +15,7 @@ SN = "1960800945"  # *必填*：打印机编号，必须要在管理后台里手
 # 飞鹅云后台入口和账号
 # https://admin.feieyun.com/index.php
 # 55387938@qq.com
-# 12345678
+# 123456789
 
 
 class UserVisionData:
