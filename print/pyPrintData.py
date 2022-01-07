@@ -8,14 +8,14 @@ from texttable import Texttable
 # 说明：飞鹅云后台配置参数
 URL = "http://api.feieyun.cn/Api/Open/"  # 不需要修改
 USER = "55387938@qq.com"  # *必填*：飞鹅云后台注册账号
-UKEY = "1HPJtdVP3FZSBnkJ2"  # *必填*: 飞鹅云后台注册账号后生成的UKEY 【备注：这不是填打印机的KEY】
-SN = "1960800945"  # *必填*：打印机编号，必须要在管理后台里手动添加打印机或者通过API添加之后，才能调用API
+UKEY = "HPJtdVP3FZSBnkJ2"  # *必填*: 飞鹅云后台注册账号后生成的UKEY 【备注：这不是填打印机的KEY】
+SN = "960800945"  # *必填*：打印机编号，必须要在管理后台里手动添加打印机或者通过API添加之后，才能调用API
 
 
 # 飞鹅云后台入口和账号
 # https://admin.feieyun.com/index.php
 # 55387938@qq.com
-# 123456789
+# 12345678
 
 
 class UserVisionData:
@@ -28,9 +28,9 @@ class UserVisionData:
         # 字符串分割
         array_print_data = args.split(",")
 
-        # 字符长度判断
-        if len(array_print_data) == 16:
-            self.title = "5.67眼镜甄选"
+        # 判断字符长度
+        if len(array_print_data) == 21:
+            self.title = "5.76眼镜甄选"
             self.printDateTime = time.strftime("%Y-%m-%d %H:%M:%S")
 
             # 用户信息
@@ -40,20 +40,27 @@ class UserVisionData:
             self.Purpose = array_print_data[3]
 
             # 验光信息
-            self.SPH_RightEye = array_print_data[4]
-            self.SPH_LeftEye = array_print_data[5]
-            self.CYL_RightEye = array_print_data[6]
-            self.CYL_LeftEye = array_print_data[7]
-            self.AXIS_RightEye = array_print_data[8]
-            self.AXIS_LeftEye = array_print_data[9]
-            self.DOWN_RightEye = array_print_data[10]
-            self.DOWN_LeftEye = array_print_data[11]
-            self.DIST_RightEye = array_print_data[12]
-            self.DIST_LeftEye = array_print_data[13]
+            self.SPH_RightEye = '%.2f' % float(array_print_data[4])
+            self.SPH_LeftEye = '%.2f' % float(array_print_data[5])
+            self.CYL_RightEye = '%.2f' % float(array_print_data[6])
+            self.CYL_LeftEye = '%.2f' % float(array_print_data[7])
+            self.AXIS_RightEye = '%.2f' % float(array_print_data[8])
+            self.AXIS_LeftEye = '%.2f' % float(array_print_data[9])
+            self.DOWN_RightEye = '%.2f' % float(array_print_data[10])
+            self.DOWN_LeftEye = '%.2f' % float(array_print_data[11])
+            self.DIST_RightEye = '%.2f' % float(array_print_data[12])
+            self.DIST_LeftEye = '%.2f' % float(array_print_data[13])
 
-            # 备注
-            self.Comments = array_print_data[14]
-            self.filePath = array_print_data[15]
+            # 商品信息
+            self.GlassName = array_print_data[14]
+            self.GlassType = array_print_data[15]
+            self.GlassFrameName = array_print_data[16]
+            self.GlassFrameMode = array_print_data[17]
+            self.Comments = array_print_data[18]
+
+            # 打印配置参数
+            self.filePath = array_print_data[19]
+            self.printType = array_print_data[20]
 
             # 需要打印内容记录
             self.logcat(args)
@@ -102,12 +109,13 @@ class UserVisionData:
         split_line = "------------------------------------------"
 
         html = "<CB>" + self.title + "</CB>\n"
-        html += "用户姓名:" + self.userName + "\n"
-        html += "电话号码:" + self.phoneNum + "\n"
-        html += "所属人:" + self.billOwner + "\n"
-        html += "配镜用途:" + self.Purpose + "\n"
+        html = "<CB>您眼睛BUG的修复师</CB>\n"
+        html += "用户姓名：" + self.userName + "\n"
+        html += "电话号码：" + self.phoneNum + "\n"
+        html += "所 属 人：" + self.billOwner + "\n"
+        html += "配镜用途：" + self.Purpose + "\n"
         html += split_line + "\n"
-        html += "验光数据:\n"
+        html += "验光数据：\n"
 
         table_eyes_info = Texttable()
         table_eyes_info.set_deco(Texttable.HEADER)
@@ -115,16 +123,23 @@ class UserVisionData:
         table_eyes_info.set_cols_align(["c", "c", "c", "c", "c", "c"])
         table_eyes_info.set_cols_dtype(['t', 't', 't', 't', 't', 't'])
         table_eyes_info.add_rows([["", "度数", "散光", "轴位", "下加光", "瞳距"],
-                                  ["右眼:", self.SPH_RightEye, self.CYL_RightEye, self.AXIS_RightEye, self.DOWN_RightEye,
+                                  ["右眼：", self.SPH_RightEye, self.CYL_RightEye, self.AXIS_RightEye, self.DOWN_RightEye,
                                    self.DIST_RightEye],
-                                  ["左眼:", self.SPH_LeftEye, self.CYL_LeftEye, self.AXIS_LeftEye, self.DOWN_LeftEye,
+                                  ["左眼：", self.SPH_LeftEye, self.CYL_LeftEye, self.AXIS_LeftEye, self.DOWN_LeftEye,
                                    self.DIST_LeftEye]])
 
         html += table_eyes_info.draw()
         html += "\n"
         html += split_line + "\n"
-        html += "备注信息:" + self.Comments + "\n"
-        html += "打印时间:" + self.printDateTime + "\n"
+
+        if self.printType == "2":
+            html += "镜   片：" + self.GlassName + "\n"
+            html += "镜片品类：" + self.GlassType + "\n"
+            html += "镜   架：" + self.GlassFrameName + "\n"
+            html += "镜架型号：" + self.GlassFrameMode + "\n"
+
+        html += "备注信息：" + self.Comments + "\n"
+        html += "打印时间：" + self.printDateTime + "\n"
         html += split_line + "\n"
         html += "欢迎光临,谢谢惠顾!\n"
         html += "联系方式:13621603550\n"
@@ -132,7 +147,7 @@ class UserVisionData:
 
         # 格式化HTML
         html = html.replace("=", "-")
-        html = html.replace("\n", "<BR>")
+        # html = html.replace("\n", "<BR>")
 
         self.logcat(html)
         return html
@@ -198,7 +213,7 @@ def printData():
         print(html_content)
 
         # 需要云端打印可以开放注释
-        userVisionData.requestPrintApi(html_content)
+        # userVisionData.requestPrintApi(html_content)
 
     else:
         print("input parameters error...")

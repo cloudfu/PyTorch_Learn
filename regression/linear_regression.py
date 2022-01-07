@@ -57,4 +57,4 @@ for epoch in range(num_epochs):
 plt.ioff()
 plt.show()
 # Save the model checkpoint
-torch.save(model.state_dict(), 'model.ckpt')
+torch.save(model.state_dict(), '../demo/model.ckpt')

@@ -34,7 +34,7 @@ of backprop, check out this `video from
 Usage in PyTorch
 ~~~~~~~~~~~
 Let's take a look at a single training step.
-For this example, we load a pretrained resnet18 model from ``torchvision``.
+For this regression, we load a pretrained resnet18 model from ``torchvision``.
 We create a random data tensor to represent a single image with 3 channels, and height & width of 64,
 and its corresponding ``label`` initialized to some random values.
 """
@@ -199,7 +199,7 @@ print(-2*b == b.grad)
 #       \frac{\partial l}{\partial x_{n}}
 #       \end{array}\right)
 #
-# This characteristic of vector-Jacobian product is what we use in the above example;
+# This characteristic of vector-Jacobian product is what we use in the above regression;
 # ``external_grad`` represents :math:`\vec{v}`.
 #
 
@@ -229,7 +229,7 @@ print(-2*b == b.grad)
 # - accumulates them in the respective tensor’s ``.grad`` attribute, and
 # - using the chain rule, propagates all the way to the leaf tensors.
 #
-# Below is a visual representation of the DAG in our example. In the graph,
+# Below is a visual representation of the DAG in our regression. In the graph,
 # the arrows are in the direction of the forward pass. The nodes represent the backward functions
 # of each operation in the forward pass. The leaf nodes in blue represent our leaf tensors ``a`` and ``b``.
 #
@@ -274,7 +274,7 @@ print(f"Does `b` require gradients?: {b.requires_grad}")
 # `finetuning a pretrained network <https://pytorch.org/tutorials/beginner/finetuning_torchvision_models_tutorial.html>`__
 #
 # In finetuning, we freeze most of the model and typically only modify the classifier layers to make predictions on new labels.
-# Let's walk through a small example to demonstrate this. As before, we load a pretrained resnet18 model, and freeze all the parameters.
+# Let's walk through a small regression to demonstrate this. As before, we load a pretrained resnet18 model, and freeze all the parameters.
 
 from torch import nn, optim
 
