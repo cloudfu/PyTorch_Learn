@@ -8,8 +8,8 @@ from texttable import Texttable
 # 说明：飞鹅云后台配置参数
 URL = "http://api.feieyun.cn/Api/Open/"  # 不需要修改
 USER = "55387938@qq.com"  # *必填*：飞鹅云后台注册账号
-UKEY = "1HPJtdVP3FZSBnkJ2"  # *必填*: 飞鹅云后台注册账号后生成的UKEY 【备注：这不是填打印机的KEY】
-SN = "1960800945"  # *必填*：打印机编号，必须要在管理后台里手动添加打印机或者通过API添加之后，才能调用API
+UKEY = "HPJtdVP3FZSBnkJ2"  # *必填*: 飞鹅云后台注册账号后生成的UKEY 【备注：这不是填打印机的KEY】
+SN = "960800945"  # *必填*：打印机编号，必须要在管理后台里手动添加打印机或者通过API添加之后，才能调用API
 
 
 # 飞鹅云后台入口和账号
@@ -108,6 +108,7 @@ class UserVisionData:
 
         split_line = "------------------------------------------"
 
+        # 用户基本信息
         html = "<CB>" + self.title + "</CB>\n"
         html += "<CB>您眼睛BUG的修复师</CB>\n"
         html += "用户姓名：" + self.userName + "\n"
@@ -117,6 +118,7 @@ class UserVisionData:
         html += split_line + "\n"
         html += "验光数据：\n"
 
+        # 验光信息
         table_eyes_info = Texttable()
         table_eyes_info.set_deco(Texttable.HEADER)
         table_eyes_info.set_header_align(["c", "c", "c", "c", "c", "c"])
@@ -132,18 +134,22 @@ class UserVisionData:
         html += "\n"
         html += split_line + "\n"
 
+        # 条件打印：print=2， 需要打印产品信息
         if self.printType == "2":
             html += "镜   片：" + self.GlassName + "\n"
             html += "镜片品类：" + self.GlassType + "\n"
             html += "镜   架：" + self.GlassFrameName + "\n"
             html += "镜架型号：" + self.GlassFrameMode + "\n"
 
+        # 添加手写8行空格
+        html += "\n\n\n\n\n\n\n\n"
+
         html += "备注信息：" + self.Comments + "\n"
         html += "打印时间：" + self.printDateTime + "\n"
         html += split_line + "\n"
         html += "欢迎光临,谢谢惠顾!\n"
         html += "联系方式:13621603550\n"
-        html += "门店地址:杨高中路2108号\n"
+        html += "人类眼睛有着精妙的结构，以及丰富巨量的5.76亿级像素。《5.76眼镜臻选》来源于此，我们最初的设想是通过精准的验光，臻选合适的镜架以及切合个人需求的镜片，能让部分人重回5.76亿的像素。\n"
 
         # 格式化HTML
         html = html.replace("=", "-")
@@ -210,7 +216,7 @@ def printData():
 
         # 格式化云端打印数据
         html_content = userVisionData.getHtmlData()
-        print(html_content)
+        # print(html_content)
 
         # 需要云端打印可以开放注释
         userVisionData.requestPrintApi(html_content)
