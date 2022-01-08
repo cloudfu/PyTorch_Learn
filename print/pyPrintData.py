@@ -109,7 +109,7 @@ class UserVisionData:
         split_line = "------------------------------------------"
 
         html = "<CB>" + self.title + "</CB>\n"
-        html = "<CB>您眼睛BUG的修复师</CB>\n"
+        html += "<CB>您眼睛BUG的修复师</CB>\n"
         html += "用户姓名：" + self.userName + "\n"
         html += "电话号码：" + self.phoneNum + "\n"
         html += "所 属 人：" + self.billOwner + "\n"
@@ -147,7 +147,7 @@ class UserVisionData:
 
         # 格式化HTML
         html = html.replace("=", "-")
-        # html = html.replace("\n", "<BR>")
+        html = html.replace("\n", "<BR>")
 
         self.logcat(html)
         return html
@@ -213,7 +213,7 @@ def printData():
         print(html_content)
 
         # 需要云端打印可以开放注释
-        # userVisionData.requestPrintApi(html_content)
+        userVisionData.requestPrintApi(html_content)
 
     else:
         print("input parameters error...")
