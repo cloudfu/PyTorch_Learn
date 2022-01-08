@@ -8,8 +8,8 @@ from texttable import Texttable
 # 说明：飞鹅云后台配置参数
 URL = "http://api.feieyun.cn/Api/Open/"  # 不需要修改
 USER = "55387938@qq.com"  # *必填*：飞鹅云后台注册账号
-UKEY = "HPJtdVP3FZSBnkJ2"  # *必填*: 飞鹅云后台注册账号后生成的UKEY 【备注：这不是填打印机的KEY】
-SN = "960800945"  # *必填*：打印机编号，必须要在管理后台里手动添加打印机或者通过API添加之后，才能调用API
+UKEY = "1HPJtdVP3FZSBnkJ2"  # *必填*: 飞鹅云后台注册账号后生成的UKEY 【备注：这不是填打印机的KEY】
+SN = "1960800945"  # *必填*：打印机编号，必须要在管理后台里手动添加打印机或者通过API添加之后，才能调用API
 
 
 # 飞鹅云后台入口和账号
